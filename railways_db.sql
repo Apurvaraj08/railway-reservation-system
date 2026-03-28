@@ -121,3 +121,68 @@ SELECT *
 FROM information_schema.columns
 WHERE table_name='bookings';
 SELECT * FROM bookings;
+-- TRAINS TABLE
+CREATE TABLE trains (
+    train_id SERIAL PRIMARY KEY,
+    train_name VARCHAR(100),
+    source VARCHAR(50),
+    destination VARCHAR(50),
+    total_seats INT
+);
+
+-- PASSENGERS TABLE
+CREATE TABLE passengers (
+    passenger_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    gender VARCHAR(10)
+);
+
+-- BOOKINGS TABLE
+CREATE TABLE bookings (
+    booking_id SERIAL PRIMARY KEY,
+    passenger_id INT,
+    train_id INT,
+    booking_date DATE,
+    seat_number INT,
+    class_type VARCHAR(20),
+    FOREIGN KEY (passenger_id) REFERENCES passengers(passenger_id),
+    FOREIGN KEY (train_id) REFERENCES trains(train_id)
+);
+
+-- PAYMENTS TABLE
+CREATE TABLE payments (
+    payment_id SERIAL PRIMARY KEY,
+    booking_id INT,
+    amount DECIMAL(10,2),
+    payment_status VARCHAR(20),
+    payment_date DATE,
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+);
+-- TRAINS
+INSERT INTO trains (train_name, source, destination, total_seats) VALUES
+('Rajdhani Express', 'Delhi', 'Mumbai', 500),
+('Shatabdi Express', 'Delhi', 'Chandigarh', 300);
+
+-- PASSENGERS
+INSERT INTO passengers (name, age, gender) VALUES
+('Amit Sharma', 28, 'Male'),
+('Priya Singh', 24, 'Female');
+
+-- BOOKINGS
+INSERT INTO bookings (passenger_id, train_id, booking_date, seat_number, class_type) VALUES
+(1, 1, '2026-03-28', 45, 'AC'),
+(2, 2, '2026-03-28', 12, 'Sleeper');
+
+-- PAYMENTS
+INSERT INTO payments (booking_id, amount, payment_status, payment_date) VALUES
+(1, 1500.00, 'Completed', '2026-03-28'),
+(2, 800.00, 'Completed', '2026-03-28');
+-- View all bookings with passenger + train details
+SELECT p.name, t.train_name, b.seat_number, b.class_type
+FROM bookings b
+JOIN passengers p ON b.passenger_id = p.passenger_id
+JOIN trains t ON b.train_id = t.train_id;
+
+-- Total revenue
+SELECT SUM(amount) AS total_revenue FROM payments;
