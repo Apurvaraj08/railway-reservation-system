@@ -17,6 +17,8 @@ class Seat(Base):
     __tablename__ = "seats"
     seat_id = Column(Integer, primary_key=True)
     train_id = Column(Integer, ForeignKey("trains.train_id"))
+    seat_type = Column(String)  # aisle, middle, window
+    berth_type = Column(String)  # lower, middle, upper
     is_available = Column(Boolean, default=True)
 
 class Booking(Base):
@@ -25,3 +27,4 @@ class Booking(Base):
     passenger_id = Column(Integer, ForeignKey("passengers.passenger_id"))
     train_id = Column(Integer, ForeignKey("trains.train_id"))
     status = Column(String)
+    seat_preference = Column(String)  # stores preferences as "aisle-lower" format
