@@ -139,11 +139,17 @@ with col1:
     st.subheader("👤 Passenger Info")
     name = st.text_input("Full Name", placeholder="Enter your name")
     age = st.number_input("Age", min_value=1, max_value=120, value=None, step=1)
+    travel_date = st.date_input("Date of Travelling")
 
 with col2:
     st.subheader("📋 Additional Details")
     gender = st.selectbox("Gender", ["", "Male", "Female", "Other"])
     train_id = st.number_input("Train ID", min_value=1, max_value=100, value=None, step=1)
+    col2_A, col2_B = st.columns(2)
+    with col2_A:
+        source = st.text_input("From (Source)", placeholder="e.g. New York")
+    with col2_B:
+        destination = st.text_input("To (Destination)", placeholder="e.g. London")
 
 with col3:
     # Use a container for the Quick Info box
@@ -213,7 +219,7 @@ with btn_col:
     book_clicked = st.button("🎟️ Book Ticket Now")
 
 if book_clicked:
-    if not name or age is None or train_id is None or not gender:
+    if not name or age is None or train_id is None or not gender or not source or not destination or travel_date is None:
         st.error("❌ Please fill in all fields!")
     else:
         with st.spinner("Processing your booking..."):
@@ -223,7 +229,7 @@ if book_clicked:
                 api_gender = gender_map.get(gender, gender)
                 
                 # Call API to book ticket with seat preferences
-                url = f"http://127.0.0.1:8000/book?name={name}&age={int(age)}&gender={api_gender}&train_id={int(train_id)}&seat_type={seat_type}&berth_type={berth_type}"
+                url = f"http://127.0.0.1:8000/book?name={name}&age={int(age)}&gender={api_gender}&train_id={int(train_id)}&source={source}&destination={destination}&travel_date={travel_date}&seat_type={seat_type}&berth_type={berth_type}"
                 res = requests.post(url, timeout=5)
                 
                 if res.status_code == 200:
@@ -233,7 +239,10 @@ if book_clicked:
                         "status": data.get("status", "UNKNOWN"),
                         "seat_id": data.get("seat_id", "N/A"),
                         "booking_id": data.get("booking_id", None),
-                        "preferences": f"{seat_type}-{berth_type}" if seat_type and berth_type else "Any"
+                        "preferences": f"{seat_type}-{berth_type}" if seat_type and berth_type else "Any",
+                        "source": source,
+                        "destination": destination,
+                        "travel_date": str(travel_date)
                     }
                     st.session_state.bookings.append(booking)
                     st.success(f"✅ Booking successful for {name}!")
@@ -273,6 +282,7 @@ if st.session_state.bookings:
                 st.markdown(f"""
                     <div class='status-confirmed'>
                         <strong style='color:#E6F1FF;'>Ticket #{idx}:</strong> <span style='color:#E6F1FF;'>{booking['name']}</span> <strong style='color: #64FFDA;'>✓ CONFIRMED</strong>
+                        <p style='margin: 5px 0; color: #E6F1FF;'>From: {booking.get('source', 'N/A')} ➔ To: {booking.get('destination', 'N/A')} | Date: {booking.get('travel_date', 'N/A')}</p>
                         <p style='margin: 5px 0; color: #E6F1FF;'>Seat: {booking['seat_id']} | Preference: {booking.get('preferences', 'Any')}</p>
                     </div>
                 """, unsafe_allow_html=True)
@@ -280,6 +290,7 @@ if st.session_state.bookings:
                 st.markdown(f"""
                     <div class='status-waiting'>
                         <strong style='color:#E6F1FF;'>Ticket #{idx}:</strong> <span style='color:#E6F1FF;'>{booking['name']}</span> <strong style='color: #C5A059;'>⏳ WAITING</strong>
+                        <p style='margin: 5px 0; color: #E6F1FF;'>From: {booking.get('source', 'N/A')} ➔ To: {booking.get('destination', 'N/A')} | Date: {booking.get('travel_date', 'N/A')}</p>
                         <p style='margin: 5px 0; color: #E6F1FF;'>Preference: {booking.get('preferences', 'Any')}</p>
                     </div>
                 """, unsafe_allow_html=True)

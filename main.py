@@ -45,7 +45,7 @@ def allocate_seat(train_id, db):
     return seat
 
 @app.post("/book")
-def book_ticket(name: str, age: int, gender: str, train_id: int, seat_type: str = "", berth_type: str = "", db: Session = Depends(get_db)):
+def book_ticket(name: str, age: int, gender: str, train_id: int, source: str = "", destination: str = "", travel_date: str = "", seat_type: str = "", berth_type: str = "", db: Session = Depends(get_db)):
 
     # 1. Create passenger
     passenger = models.Passenger(name=name, age=age, gender=gender)
@@ -67,7 +67,10 @@ def book_ticket(name: str, age: int, gender: str, train_id: int, seat_type: str 
         passenger_id=passenger.passenger_id,
         train_id=train_id,
         status=status,
-        seat_preference=seat_pref
+        seat_preference=seat_pref,
+        source=source,
+        destination=destination,
+        travel_date=travel_date
     )
 
     db.add(booking)

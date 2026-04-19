@@ -28,3 +28,6 @@ class Booking(Base):
     train_id = Column(Integer, ForeignKey("trains.train_id"))
     status = Column(String)
     seat_preference = Column(String)  # stores preferences as "aisle-lower" format
+    source = Column(String)
+    destination = Column(String)
+    travel_date = Column(String)
